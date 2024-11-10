@@ -133,15 +133,17 @@ class AppWidgetMethodCallHandler(private val context: Context, )
             val textViewsMap = call.argument<Map<String, String>>("textViews")
 
             // Create an intent to open the specified app when the widget is clicked
-            val targetIntent = context.packageManager.getLaunchIntentForPackage(targetPackageName)
+            val targetIntent = context.packageManager.getLaunchIntentForPackage(targetPackageName)?.apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                addCategory(Intent.CATEGORY_LAUNCHER) // Ensure it launches the main activity
+            }
             if (targetIntent == null) {
                 result.error("-3", "Target app not found: $targetPackageName", null)
                 return
             }
-            targetIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
             // Create a PendingIntent using the target Intent
-            val pendingIntent = PendingIntent.getActivity(context, widgetId, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val pendingIntent = PendingIntent.getActivity(context, widgetId, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
             // Set up RemoteViews and configure the widget
             val views = RemoteViews(context.packageName, layoutId).apply {
