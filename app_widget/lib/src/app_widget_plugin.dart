@@ -108,6 +108,7 @@ class AppWidgetPlugin {
     String? payload,
     String? url,
     String? androidPackageName,
+    List<int>? imageBytes,
   }) async {
     return AppWidgetPlatform.instance.configureWidget(
       androidPackageName: androidPackageName ?? _androidPackageName,
@@ -116,6 +117,7 @@ class AppWidgetPlugin {
       textViews: textViews,
       payload: payload,
       url: url,
+      imageBytes: imageBytes,
     );
   }
 

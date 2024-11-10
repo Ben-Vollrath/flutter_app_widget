@@ -13,9 +13,8 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.1.7
-  app_widget_platform_interface: ^0.4.0
-  # app_widget_platform_interface: # local dev
-  #   path: ../app_widget_platform_interface
+  app_widget_platform_interface: # local dev
+    path: ../app_widget_platform_interface
 
 dev_dependencies:
   flutter_test:

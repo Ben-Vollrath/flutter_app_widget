@@ -1,0 +1,4 @@
+<resources>
+    <!-- Other existing strings -->
+    <string name="widget_image_description">Sample image for widget</string>
+</resources>

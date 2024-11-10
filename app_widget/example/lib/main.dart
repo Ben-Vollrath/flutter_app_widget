@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'package:app_widget/app_widget.dart';
+import 'package:flutter/services.dart' show ByteData, rootBundle;
 
 void onClickWidget(String? payload) {
   // print('onClick Widget: $payload');
@@ -298,10 +299,13 @@ class ConfigureButton extends StatelessWidget {
     return ElevatedButton(
         onPressed: () async {
           if (_widgetId != null) {
-            // this means the app is started by the widget config event
             final messenger = ScaffoldMessenger.of(context);
 
-            // send configure
+            // Load the image from assets
+            final ByteData bytes = await rootBundle.load('assets/ic_launcher_round.png');
+            final List<int> imageBytes = bytes.buffer.asUint8List();
+
+            // Configure the widget with image data
             await _appWidgetPlugin.configureWidget(
               widgetId: _widgetId!,
               layoutId: _layoutId!,
@@ -309,14 +313,15 @@ class ConfigureButton extends StatelessWidget {
                 'widget_title': 'App Widget',
                 'widget_message': 'Configured in flutter'
               },
+              imageBytes: imageBytes, // Send image bytes here
               payload: jsonEncode({'number': Random().nextInt(10)}),
             );
+
             messenger.showSnackBar(
                 const SnackBar(content: Text('Widget has been configured!')));
           } else {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content:
-                    Text('Opps, no widget id from WIDGET_CONFIGURE event')));
+                content: Text('Oops, no widget id from WIDGET_CONFIGURE event')));
           }
         },
         child: const Text('Configure Widget'));

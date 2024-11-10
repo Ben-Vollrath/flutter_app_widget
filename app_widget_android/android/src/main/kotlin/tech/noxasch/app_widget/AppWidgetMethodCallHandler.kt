@@ -13,6 +13,9 @@ import androidx.annotation.NonNull
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import android.graphics.BitmapFactory
+import android.util.Base64
+
 
 class AppWidgetMethodCallHandler(private val context: Context, )
     : MethodChannel.MethodCallHandler {
@@ -109,45 +112,62 @@ class AppWidgetMethodCallHandler(private val context: Context, )
 
     /// This should be called when configuring individual widgets
     private fun configureWidget(call: MethodCall, result: MethodChannel.Result) {
-        return try {
-            if (activity == null) return result.error("-2", "Not attached to any activity!", null)
+        try {
+            if (activity == null) {
+                result.error("-2", "Not attached to any activity!", null)
+                return
+            }
 
-            val androidPackageName = call.argument<String>("androidPackageName")
-                ?:  context.packageName
+            val androidPackageName = call.argument<String>("androidPackageName") ?: context.packageName
             val widgetId = call.argument<Int>("widgetId")
                 ?: return result.error("-1", "widgetId is required!", null)
             val layoutId = call.argument<Int>("layoutId")
-                    ?: return result.error("-1", "layoutId is required!", null)
+                ?: return result.error("-1", "layoutId is required!", null)
             val payload = call.argument<String>("payload")
             val url = call.argument<String>("url")
+            val base64Image = call.argument<String>("base64Image") // Get the image data as base64
             val activityClass = Class.forName("${context.packageName}.MainActivity")
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val pendingIntent = createPendingClickIntent(activityClass, widgetId, payload, url)
             val textViewsMap = call.argument<Map<String, String>>("textViews")
 
-            if (textViewsMap != null) {
-                val views : RemoteViews = RemoteViews(context.packageName, layoutId).apply {
-                    for ((key, value) in textViewsMap) {
-                        val textViewId: Int =
-                            context.resources.getIdentifier(key, "id", context.packageName)
-                        if (textViewId == 0) throw Exception("Id $key does not exist!")
-                        setTextViewText(textViewId, value)
-                        setOnClickPendingIntent(textViewId, pendingIntent)
-                    }
+            // Create RemoteViews object and set up text views
+            val views = RemoteViews(context.packageName, layoutId).apply {
+                // Update TextViews
+                textViewsMap?.forEach { (key, value) ->
+                    val textViewId = context.resources.getIdentifier(key, "id", context.packageName)
+                    if (textViewId == 0) throw Exception("TextView ID $key does not exist!")
+                    setTextViewText(textViewId, value)
+                    setOnClickPendingIntent(textViewId, pendingIntent)
                 }
-                appWidgetManager.updateAppWidget(widgetId, views)
+
+                // Decode the base64 image and set it to the ImageView
+                if (!base64Image.isNullOrEmpty()) {
+                    val decodedBytes = Base64.decode(base64Image, Base64.DEFAULT)
+                    val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+                    val imageViewId = context.resources.getIdentifier("widget_image", "id", context.packageName)
+                    if (bitmap != null && imageViewId != 0) {
+                        setImageViewBitmap(imageViewId, bitmap)
+                    } else {
+                        throw Exception("Failed to decode or set image in widget.")
+                    }
+                    setOnClickPendingIntent(imageViewId, pendingIntent)
+                }
             }
 
-            // This is important to confirm the widget
-            // otherwise it's considered cancelled and widget will be removed
+            // Update the widget
+            appWidgetManager.updateAppWidget(widgetId, views)
+
+            // Confirm the widget update
             val resultValue = Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-            activity!!.setResult(Activity.RESULT_OK, resultValue)
-            activity!!.finish()
+            activity?.setResult(Activity.RESULT_OK, resultValue)
+            activity?.finish()
             result.success(true)
         } catch (exception: Exception) {
             result.error("-2", exception.message, exception)
         }
     }
+
 
     private fun widgetExist(call: MethodCall, result: MethodChannel.Result) {
         val widgetId = call.argument<Int>("widgetId") ?: return result.success(false)

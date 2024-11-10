@@ -28,4 +28,11 @@
         android:gravity="center"
         android:textSize="18sp"
         tools:text="Message" />
+    <ImageView
+        android:id="@+id/widget_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/widget_image_description"
+        android:scaleType="centerCrop"
+        tools:src="@drawable/ic_launcher_round" /> <!-- Placeholder image -->
 </LinearLayout>

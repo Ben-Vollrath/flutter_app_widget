@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:app_widget_android/src/app_widget_android_platform.dart';
 import 'package:app_widget_platform_interface/app_widget_platform_interface.dart';
 import 'package:flutter/services.dart';
@@ -50,9 +52,11 @@ class AppWidgetAndroidPlugin extends AppWidgetAndroid {
     Map<String, String>? textViews = const {},
     String? payload,
     String? url,
+    List<int>? imageBytes,
   }) {
     assert(widgetId != null, 'widgetId is required for android!');
     assert(layoutId != null, 'layoutId is required for android!');
+    final base64Image = base64Encode(imageBytes!);
 
     return _methodChannel.invokeMethod<bool>('configureWidget', {
       'androidPackageName': androidPackageName,
@@ -61,6 +65,7 @@ class AppWidgetAndroidPlugin extends AppWidgetAndroid {
       'textViews': textViews,
       'payload': payload,
       'url': url,
+      'base64Image': base64Image,
     });
   }
 

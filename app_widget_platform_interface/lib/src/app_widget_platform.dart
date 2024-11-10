@@ -1,4 +1,6 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 
 abstract class AppWidgetPlatform extends PlatformInterface {
   /// Constructs a AppWidgetPlatform.
@@ -38,6 +40,7 @@ abstract class AppWidgetPlatform extends PlatformInterface {
     Map<String, String>? textViews,
     String? payload,
     String? url,
+    List<int>? imageBytes,
   }) async {
     throw UnimplementedError();
   }
