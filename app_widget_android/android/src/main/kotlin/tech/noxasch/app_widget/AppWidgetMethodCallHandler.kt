@@ -125,23 +125,35 @@ class AppWidgetMethodCallHandler(private val context: Context, )
                 ?: return result.error("-1", "layoutId is required!", null)
             val payload = call.argument<String>("payload")
             val url = call.argument<String>("url")
-            val base64Image = call.argument<String>("base64Image") // Get the image data as base64
-            val activityClass = Class.forName("${context.packageName}.MainActivity")
+            val base64Image = call.argument<String>("base64Image")
+            val targetPackageName = call.argument<String>("targetPackageName")
+                ?: return result.error("-3", "targetPackageName is required", null)
+
             val appWidgetManager = AppWidgetManager.getInstance(context)
-            val pendingIntent = createPendingClickIntent(activityClass, widgetId, payload, url)
             val textViewsMap = call.argument<Map<String, String>>("textViews")
 
-            // Create RemoteViews object and set up text views
+            // Create an intent to open the specified app when the widget is clicked
+            val targetIntent = context.packageManager.getLaunchIntentForPackage(targetPackageName)
+            if (targetIntent == null) {
+                result.error("-3", "Target app not found: $targetPackageName", null)
+                return
+            }
+            targetIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+            // Create a PendingIntent using the target Intent
+            val pendingIntent = PendingIntent.getActivity(context, widgetId, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+            // Set up RemoteViews and configure the widget
             val views = RemoteViews(context.packageName, layoutId).apply {
-                // Update TextViews
+                // Set up text views
                 textViewsMap?.forEach { (key, value) ->
                     val textViewId = context.resources.getIdentifier(key, "id", context.packageName)
                     if (textViewId == 0) throw Exception("TextView ID $key does not exist!")
                     setTextViewText(textViewId, value)
-                    setOnClickPendingIntent(textViewId, pendingIntent)
+                    setOnClickPendingIntent(textViewId, pendingIntent) // Set click intent
                 }
 
-                // Decode the base64 image and set it to the ImageView
+                // Set up the ImageView with the base64 image, if provided
                 if (!base64Image.isNullOrEmpty()) {
                     val decodedBytes = Base64.decode(base64Image, Base64.DEFAULT)
                     val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
@@ -151,14 +163,14 @@ class AppWidgetMethodCallHandler(private val context: Context, )
                     } else {
                         throw Exception("Failed to decode or set image in widget.")
                     }
-                    setOnClickPendingIntent(imageViewId, pendingIntent)
+                    setOnClickPendingIntent(imageViewId, pendingIntent) // Set click intent for the image
                 }
             }
 
             // Update the widget
             appWidgetManager.updateAppWidget(widgetId, views)
 
-            // Confirm the widget update
+            // Confirm widget update
             val resultValue = Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
             activity?.setResult(Activity.RESULT_OK, resultValue)
             activity?.finish()
@@ -167,6 +179,7 @@ class AppWidgetMethodCallHandler(private val context: Context, )
             result.error("-2", exception.message, exception)
         }
     }
+
 
 
     private fun widgetExist(call: MethodCall, result: MethodChannel.Result) {

@@ -41,6 +41,7 @@ abstract class AppWidgetPlatform extends PlatformInterface {
     String? payload,
     String? url,
     List<int>? imageBytes,
+    String? targetPackageName,
   }) async {
     throw UnimplementedError();
   }

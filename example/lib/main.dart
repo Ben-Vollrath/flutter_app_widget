@@ -315,6 +315,7 @@ class ConfigureButton extends StatelessWidget {
               },
               imageBytes: imageBytes, // Send image bytes here
               payload: jsonEncode({'number': Random().nextInt(10)}),
+              targetPackageName: "com.android.chrome",
             );
 
             messenger.showSnackBar(
