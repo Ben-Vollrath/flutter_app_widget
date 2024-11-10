@@ -11,14 +11,14 @@ packages:
   app_widget_android:
     dependency: transitive
     description:
-      path: "../../app_widget_android"
+      path: "../app_widget_android"
       relative: true
     source: path
     version: "0.4.0"
   app_widget_platform_interface:
     dependency: transitive
     description:
-      path: "../../app_widget_platform_interface"
+      path: "../app_widget_platform_interface"
       relative: true
     source: path
     version: "0.4.0"

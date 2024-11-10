@@ -11,10 +11,9 @@ packages:
   app_widget_platform_interface:
     dependency: transitive
     description:
-      name: app_widget_platform_interface
-      sha256: a288112ec826c25e7638ddc30c33a5e7279cfc2eadba89ccb33bc8d3ddbb589c
-      url: "https://pub.dev"
-    source: hosted
+      path: "../../app_widget_platform_interface"
+      relative: true
+    source: path
     version: "0.4.0"
   async:
     dependency: transitive
