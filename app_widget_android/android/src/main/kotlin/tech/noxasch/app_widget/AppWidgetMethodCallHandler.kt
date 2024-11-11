@@ -128,7 +128,7 @@ class AppWidgetMethodCallHandler(private val context: Context, )
             val base64Image = call.argument<String>("base64Image")
             val targetPackageName = call.argument<String>("targetPackageName")
                 ?: return result.error("-3", "targetPackageName is required", null)
-            val textColor = call.argument<Int>("textColor") ?: 0xFF000000.toInt()
+            val textColor = (call.argument<Any>("colorValue") as? Long)?.toInt() ?: 0xFF000000.toInt()
 
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val textViewsMap = call.argument<Map<String, String>>("textViews")
