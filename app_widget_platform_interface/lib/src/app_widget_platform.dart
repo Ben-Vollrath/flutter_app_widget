@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'dart:convert';
 import 'dart:typed_data';
@@ -42,6 +44,7 @@ abstract class AppWidgetPlatform extends PlatformInterface {
     String? url,
     List<int>? imageBytes,
     String? targetPackageName,
+    Color? colorValue,
   }) async {
     throw UnimplementedError();
   }

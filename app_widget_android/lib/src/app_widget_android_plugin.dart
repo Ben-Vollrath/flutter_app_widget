@@ -54,6 +54,7 @@ class AppWidgetAndroidPlugin extends AppWidgetAndroid {
     String? url,
     List<int>? imageBytes,
     String? targetPackageName,
+    Color? colorValue,
   }) {
     assert(widgetId != null, 'widgetId is required for android!');
     assert(layoutId != null, 'layoutId is required for android!');
@@ -68,6 +69,7 @@ class AppWidgetAndroidPlugin extends AppWidgetAndroid {
       'url': url,
       'base64Image': base64Image,
       'targetPackageName': targetPackageName,
+      'colorValue': colorValue?.value,
     });
   }
 

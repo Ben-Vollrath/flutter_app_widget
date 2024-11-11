@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:app_widget_android/app_widget_android.dart';
 import 'package:app_widget_platform_interface/app_widget_platform_interface.dart';
 import 'package:flutter/foundation.dart';
@@ -110,6 +112,7 @@ class AppWidgetPlugin {
     String? androidPackageName,
     List<int>? imageBytes,
     String? targetPackageName,
+    Color? colorValue,
   }) async {
     return AppWidgetPlatform.instance.configureWidget(
       androidPackageName: androidPackageName ?? _androidPackageName,
@@ -120,6 +123,7 @@ class AppWidgetPlugin {
       url: url,
       imageBytes: imageBytes,
       targetPackageName: targetPackageName,
+      colorValue: colorValue,
     );
   }
 

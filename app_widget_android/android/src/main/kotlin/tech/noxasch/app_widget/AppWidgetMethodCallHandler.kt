@@ -128,6 +128,7 @@ class AppWidgetMethodCallHandler(private val context: Context, )
             val base64Image = call.argument<String>("base64Image")
             val targetPackageName = call.argument<String>("targetPackageName")
                 ?: return result.error("-3", "targetPackageName is required", null)
+            val textColor = call.argument<Int>("textColor") ?: 0xFF000000.toInt()
 
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val textViewsMap = call.argument<Map<String, String>>("textViews")
@@ -152,6 +153,7 @@ class AppWidgetMethodCallHandler(private val context: Context, )
                     val textViewId = context.resources.getIdentifier(key, "id", context.packageName)
                     if (textViewId == 0) throw Exception("TextView ID $key does not exist!")
                     setTextViewText(textViewId, value)
+                    setTextColor(textViewId, textColor)
                     setOnClickPendingIntent(textViewId, pendingIntent) // Set click intent
                 }
 
